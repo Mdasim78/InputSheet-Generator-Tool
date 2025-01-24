@@ -76,7 +76,7 @@ public class GUI extends JFrame {
 		}
 	}
 	private static void exportEDISheetFile(File destinationFolder,XSSFWorkbook EDIwb) throws IOException {
-		File outputFile = new File(destinationFolder, "EDI_InputSheet.x1sx");
+		File outputFile = new File(destinationFolder, "EDI_InputSheet.xlsx");
 		try(FileOutputStream fos = new FileOutputStream(outputFile)){
 			EDIwb.write(fos);
 			fos.close();
@@ -98,24 +98,20 @@ public class GUI extends JFrame {
 		lblHeader.setHorizontalAlignment(SwingConstants.CENTER);
 		lblHeader.setBounds(100, 13, 294, 24);
 		contentPane.add(lblHeader);
+		
+		JLabel lblScenarioName = new JLabel("Scenario Name : ");
+		lblScenarioName.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		lblScenarioName.setBounds(60, 90, 113, 16);//(60, 170, 113, 32);
+		contentPane.add(lblScenarioName);
 
-		JLabel lblSourceSheet = new JLabel("Source Sheet : ");
-		lblSourceSheet.setFont(new Font("Times New Roman", Font.BOLD, 14));
-		lblSourceSheet.setBounds(60, 90, 113, 16);
-		contentPane.add(lblSourceSheet);
-
-		JComboBox<String> comboBoxSourceSheet = new JComboBox<String>();
-		comboBoxSourceSheet.setFont(new Font ("Times New Roman", Font.BOLD, 14));
-		comboBoxSourceSheet.setBackground(Color.WHITE);
-		comboBoxSourceSheet.setBounds(235, 90, 200, 20);
-		comboBoxSourceSheet.addItem("Select Source Sheet");
-		comboBoxSourceSheet.addItem("UTC Sheet");
-		comboBoxSourceSheet.addItem("Claim Result Sheet");
-		contentPane.add(comboBoxSourceSheet);
-
+		JTextField textField_ScenarioName = new JTextField();
+		textField_ScenarioName.setBounds(235, 90, 200, 20);//(235, 170, 200, 20);
+		contentPane.add(textField_ScenarioName);
+		textField_ScenarioName.setColumns(10);
+		
 		JLabel lblOutPutType = new JLabel("OutPut Type : ");
 		lblOutPutType.setFont(new Font("Times New Roman", Font.BOLD, 14) );
-		lblOutPutType.setBounds(60, 130, 113, 24);
+		lblOutPutType.setBounds(60, 125, 113, 24);
 		contentPane.add(lblOutPutType);
 
 		comboBoxLblOutPutType = new JComboBox<String>();
@@ -127,19 +123,14 @@ public class GUI extends JFrame {
 		comboBoxLblOutPutType.addItem("EDI Automation");
 		contentPane.add(comboBoxLblOutPutType);
 
-		JLabel lblScenarioName = new JLabel("Scenario Name : ");
-		lblScenarioName.setFont(new Font("Times New Roman", Font.BOLD, 14));
-		lblScenarioName.setBounds(60, 170, 113, 32);
-		contentPane.add(lblScenarioName);
-
-		JTextField textField_ScenarioName = new JTextField();
-		textField_ScenarioName.setBounds(235, 170, 200, 20);
-		contentPane.add(textField_ScenarioName);
-		textField_ScenarioName.setColumns(10);
+		JLabel lblSourceSheet = new JLabel("Import UTC : ");
+		lblSourceSheet.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		lblSourceSheet.setBounds(60, 163, 113, 32);//(60, 90, 113, 16);
+		contentPane.add(lblSourceSheet);
 
 		JButton btnImportSheet = new JButton("Import Sheet");
 		btnImportSheet.setFont(new Font("Times New Roman", Font.BOLD, 12));
-		btnImportSheet.setBounds(60, 210, 113, 20);
+		btnImportSheet.setBounds(235, 170, 113, 20);
 		contentPane.add(btnImportSheet);
 		btnImportSheet.addActionListener(
 				e->{

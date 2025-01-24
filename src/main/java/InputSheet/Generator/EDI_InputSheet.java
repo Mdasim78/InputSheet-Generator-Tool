@@ -80,7 +80,7 @@ public class EDI_InputSheet {
 		try {
 			switch(cell.getCellType()) {
 			case NUMERIC:return cell.getLocalDateTimeCellValue().format(java.time. format.DateTimeFormatter.ofPattern("yyyyMMdd"));
-			case STRING:return new SimpleDateFormat("yyyyMidd").format(new SimpleDateFormat("M/dd/yyyy").parse(cell.getStringCellValue()));
+			case STRING:return new SimpleDateFormat("yyyyMMdd").format(new SimpleDateFormat("M/dd/yyyy").parse(cell.getStringCellValue()));
 			}
 		}
 		catch (NullPointerException | ParseException e) {
@@ -88,7 +88,19 @@ public class EDI_InputSheet {
 		}
 		return null;
 	}
-
+	//check date cell type & return string data from amount cell accordingly
+	public static String getAmountCellData(HSSFCell cell) {
+		try {
+			switch(cell.getCellType()) {
+			case NUMERIC:return String.valueOf(((double)cell.getNumericCellValue())).replaceAll(" ","");
+			case STRING: return cell.getStringCellValue().replaceAll("[^\\d]","");
+			}
+		}
+		catch (NullPointerException e) {
+			System.out.println("Skipped cell because cell is empty or unable to parse date format");
+		}
+		return null;
+	}
 	public static void writeProfData(HSSFSheet claimSheet, int startRowNo, int lastRowNo, XSSFSheet DataSheet) {
 		XSSFRow DataSheetfirstRowNo= null;
 		double totalAmount = 0;
@@ -107,9 +119,9 @@ public class EDI_InputSheet {
 				//p/f
 				setCellToText(DataSheetlastRowNo.createCell(3)).setCellValue("P");
 				//Patient Account Number
-				setCellToText(DataSheetlastRowNo.createCell(30)).setCellValue("PROF00"+new DecimalFormat("000").format((int)claimSheetRow.getCell(0).getNumericCellValue()));
+				setCellToText(DataSheetlastRowNo.createCell(19)).setCellValue("PROF00"+new DecimalFormat("000").format((int)claimSheetRow.getCell(0).getNumericCellValue()));
 				//DX code
-				String DXCode[] = getCellData(claimSheet.getRow(startRowNo).getCell(22)).replace(".", "").split(",");
+				String DXCode[] = getCellData(claimSheet.getRow(startRowNo).getCell(7)).replace(".", "").split(",");
 				setCellToText(DataSheetlastRowNo.createCell(9)).setCellValue(DXCode[0]);
 				if(DXCode.length > 1) {
 					for(int k=1;k<DXCode.length;k++) {
@@ -119,34 +131,35 @@ public class EDI_InputSheet {
 			}
 			else {
 				//index number
-				setCellToText(DataSheetlastRowNo.createCell(0)).setCellValue(getCellData(claimSheet.getRow(i).getCell(31)));
+				setCellToText(DataSheetlastRowNo.createCell(0)).setCellValue(getCellData(claimSheet.getRow(i).getCell(9)));
 				//line count
-				setCellToText(DataSheetfirstRowNo.createCell(6)).setCellValue(getCellData(claimSheet.getRow(i).getCell(31)));
+				setCellToText(DataSheetfirstRowNo.createCell(6)).setCellValue(getCellData(claimSheet.getRow(i).getCell(9)));
 				//total amount
-				totalAmount = totalAmount+claimSheetRow.getCell(45).getNumericCellValue();
-				setCellToText(DataSheetfirstRowNo.createCell(18)).setCellValue(String.format("%.2f",totalAmount));
+				//total amount
+				totalAmount = totalAmount+Double.parseDouble(getAmountCellData(claimSheetRow.getCell(18)));
+				setCellToText(DataSheetfirstRowNo.createCell(10)).setCellValue(String.format("%.2f",totalAmount));
 				//from date
-				setCellToText(DataSheetlastRowNo.createCell(7)).setCellValue(getDateCellData(claimSheetRow.getCell(42)));
+				setCellToText(DataSheetlastRowNo.createCell(7)).setCellValue(getDateCellData(claimSheetRow.getCell(15)));
 				//service end date
-				setCellToText(DataSheetlastRowNo.createCell(8)).setCellValue(getDateCellData(claimSheetRow.getCell(43)));
+				setCellToText(DataSheetlastRowNo.createCell(8)).setCellValue(getDateCellData(claimSheetRow.getCell(16)));
 				//POS
-				setCellToText(DataSheetlastRowNo.createCell(26)).setCellValue(getCellData(claimSheetRow.getCell(32)));
+				setCellToText(DataSheetlastRowNo.createCell(17)).setCellValue(getCellData(claimSheetRow.getCell(10)));
 				//dos
-				setCellToText(DataSheetlastRowNo.createCell(21)).setCellValue(getDateCellData(claimSheetRow.getCell(42)));
+				setCellToText(DataSheetlastRowNo.createCell(12)).setCellValue(getDateCellData(claimSheetRow.getCell(15)));
 				//Procedure code & modifier
-				setCellToText(DataSheetlastRowNo.createCell(22)).setCellValue(getCellData(claimSheetRow.getCell(40)));
+				setCellToText(DataSheetlastRowNo.createCell(13)).setCellValue(getCellData(claimSheetRow.getCell(13)));
 				//modifier
-				if(claimSheetRow.getCell(33) != null && claimSheetRow.getCell(33).getCellType() != CellType.BLANK) {
-					String multipleModifer[]= getCellData(claimSheetRow.getCell(33)).split(",");
+				if(claimSheetRow.getCell(11) != null && claimSheetRow.getCell(11).getCellType() != CellType.BLANK) {
+					String multipleModifer[]= getCellData(claimSheetRow.getCell(11)).split(",");
 					for(int k=0;k<multipleModifer.length;k++) {
 						if(k>4) break;
-						setCellToText(DataSheetlastRowNo.getCell(22)).setCellValue(DataSheetlastRowNo.getCell(22).getStringCellValue()+":"+multipleModifer[k]);
+						setCellToText(DataSheetlastRowNo.getCell(13)).setCellValue(DataSheetlastRowNo.getCell(13).getStringCellValue()+":"+multipleModifer[k]);
 					}
 				}
 				//charges
-				setCellToText(DataSheetlastRowNo.createCell(24)).setCellValue(String.valueOf(claimSheetRow.getCell(45).getNumericCellValue()));
+				setCellToText(DataSheetlastRowNo.createCell(15)).setCellValue(String.format("%.2f",Double.parseDouble(getAmountCellData(claimSheetRow.getCell(18)))));
 				//unit
-				setCellToText(DataSheetlastRowNo.createCell(25)).setCellValue(getCellData(claimSheetRow.getCell(44)));
+				setCellToText(DataSheetlastRowNo.createCell(16)).setCellValue(getCellData(claimSheetRow.getCell(17)));
 				try {
 					if(claimSheet.getRow(i+1).getCell(1).getStringCellValue().equals("HCFA") || claimSheet.getRow(i+1).getCell(1).getStringCellValue().equals("UB")) break;
 
@@ -180,11 +193,11 @@ public class EDI_InputSheet {
 				//p/f
 				setCellToText(DataSheetlastRowNo.createCell(3)).setCellValue("F");
 				//Patient Account Number
-				setCellToText(DataSheetlastRowNo.createCell(30)).setCellValue("INST00"+new DecimalFormat("000").format((int)claimSheetRow.getCell(0).getNumericCellValue()));
+				setCellToText(DataSheetlastRowNo.createCell(19)).setCellValue("INST00"+new DecimalFormat("000").format((int)claimSheetRow.getCell(0).getNumericCellValue()));
 				//Bill type
-				setCellToText(DataSheetlastRowNo.createCell(27)).setCellValue(getCellData(claimSheetRow.getCell(26)));
+				setCellToText(DataSheetlastRowNo.createCell(18)).setCellValue(getCellData(claimSheetRow.getCell(8)));
 				//DX code
-				String DXCode[]=getCellData(claimSheet.getRow(startRowNo).getCell(22)).replace(".","").split(",");
+				String DXCode[]=getCellData(claimSheet.getRow(startRowNo).getCell(7)).replace(".","").split(",");
 				setCellToText(DataSheetlastRowNo.createCell(9)).setCellValue(DXCode[0]);
 				if(DXCode.length > 1) {
 					for(int k=1;k<DXCode.length;k++) {
@@ -194,47 +207,47 @@ public class EDI_InputSheet {
 			}
 			else {
 				//index number
-				setCellToText(DataSheetlastRowNo.createCell(0)).setCellValue(getCellData(claimSheet.getRow(i).getCell(31)));
+				setCellToText(DataSheetlastRowNo.createCell(0)).setCellValue(getCellData(claimSheet.getRow(i).getCell(9)));
 				//line count
-				setCellToText(DataSheetfirstRowNo.createCell(6)).setCellValue(getCellData(claimSheet.getRow(i).getCell(31)));
+				setCellToText(DataSheetfirstRowNo.createCell(6)).setCellValue(getCellData(claimSheet.getRow(i).getCell(9)));
 				//from date
-				setCellToText(DataSheetlastRowNo.createCell(7)).setCellValue(getDateCellData(claimSheetRow.getCell(42)));
+				setCellToText(DataSheetfirstRowNo.createCell(7)).setCellValue(getDateCellData(claimSheetRow.getCell(15)));
 				//service end date
-				setCellToText(DataSheetlastRowNo.createCell(8)).setCellValue(getDateCellData(claimSheetRow.getCell(43)));
+				setCellToText(DataSheetfirstRowNo.createCell(8)).setCellValue(getDateCellData(claimSheetRow.getCell(16)));
 				//total amount
-				totalAmount = totalAmount+claimSheetRow.getCell(45).getNumericCellValue();
-				setCellToText(DataSheetfirstRowNo.createCell(18)).setCellValue(String.format("%.2f",totalAmount));
+				totalAmount = totalAmount+Double.parseDouble(getAmountCellData(claimSheetRow.getCell(18)));
+				setCellToText(DataSheetfirstRowNo.createCell(10)).setCellValue(String.format("%.2f",totalAmount));
 				//RevenueCode
-				setCellToText(DataSheetlastRowNo.createCell(23)).setCellValue(getCellData(claimSheetRow.getCell(39)));
+				setCellToText(DataSheetlastRowNo.createCell(14)).setCellValue(getCellData(claimSheetRow.getCell(12)));
 				//Procedure code & modifier
-				setCellToText(DataSheetlastRowNo.createCell(22)).setCellValue(getCellData(claimSheetRow.getCell(40)));
+				setCellToText(DataSheetlastRowNo.createCell(13)).setCellValue(getCellData(claimSheetRow.getCell(13)));
 				//dos
-				setCellToText(DataSheetlastRowNo.createCell(21)).setCellValue(getDateCellData(claimSheetRow.getCell(42)));
+				setCellToText(DataSheetlastRowNo.createCell(12)).setCellValue(getDateCellData(claimSheetRow.getCell(15)));
 				//modifier
-				if(claimSheetRow.getCell(33) != null && claimSheetRow.getCell(33).getCellType() != CellType.BLANK) {
-					String multipleModifer[]= getCellData(claimSheetRow.getCell(33)).split(",");
+				if(claimSheetRow.getCell(11) != null && claimSheetRow.getCell(11).getCellType() != CellType.BLANK) {
+					String multipleModifer[]= getCellData(claimSheetRow.getCell(11)).split(",");
 					for(int k=0;k<multipleModifer.length;k++) {
 						if(k>4) break;
-						setCellToText(DataSheetlastRowNo.getCell(22)).setCellValue(DataSheetlastRowNo.getCell(22).getStringCellValue()+":"+multipleModifer[k]);
-
-						//charges
-						setCellToText(DataSheetlastRowNo.createCell(24)).setCellValue(String.valueOf(claimSheetRow.getCell(45).getNumericCellValue()));
-						//unit
-						setCellToText(DataSheetlastRowNo.createCell(25)).setCellValue(getCellData(claimSheetRow.getCell(44)));
-						try {
-							if(claimSheet.getRow(i+1).getCell(1).getStringCellValue().equals("HCFA") || claimSheet.getRow(i+1).getCell(1).getStringCellValue().equals("UB")) break;
-							else {
-								System.out.println(claimSheet.getRow(i+1).getCell(1).getStringCellValue());
-								DataSheet.createRow(DataSheet.getLastRowNum()+1);
-							}
-						}
-						catch(NullPointerException e) {
-							break;
-						}
-
+						setCellToText(DataSheetlastRowNo.getCell(13)).setCellValue(DataSheetlastRowNo.getCell(13).getStringCellValue()+":"+multipleModifer[k]);
 					}
 				}
+				//charges
+				setCellToText(DataSheetlastRowNo.createCell(15)).setCellValue(String.format("%.2f",Double.parseDouble(getAmountCellData(claimSheetRow.getCell(18)))));
+				//unit
+				setCellToText(DataSheetlastRowNo.createCell(16)).setCellValue(getCellData(claimSheetRow.getCell(17)));
+				try {
+					if(claimSheet.getRow(i+1).getCell(1).getStringCellValue().equals("HCFA") || claimSheet.getRow(i+1).getCell(1).getStringCellValue().equals("UB")) break;
+					else {
+						System.out.println(claimSheet.getRow(i+1).getCell(1).getStringCellValue());
+						DataSheet.createRow(DataSheet.getLastRowNum()+1);
+					}
+				}
+				catch(NullPointerException e) {
+					break;
+				}
+
 			}
 		}
+
 	}
 }
