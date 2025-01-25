@@ -27,7 +27,7 @@ public class Automation_InputSheet {
 		automationInputSheets[0] = new XSSFWorkbook(instInputfis);
 		XSSFSheet instDataSheet = automationInputSheets[0].getSheet("Data");
 		clearSheetContent(instDataSheet);
-		
+
 		java.io.InputStream profInputfis = EDI_InputSheet.class.getResourceAsStream("/Claim_Data_Professional.xlsx");
 		automationInputSheets[1] = new XSSFWorkbook(profInputfis);
 		XSSFSheet profDataSheet = automationInputSheets[1].getSheet("Data");
@@ -37,13 +37,13 @@ public class Automation_InputSheet {
 		HSSFWorkbook UTCfile = new HSSFWorkbook(UTCfis);
 		HSSFSheet claimSheet = UTCfile.getSheet("claims");
 
-		int lastRowNo = claimSheet.getPhysicalNumberOfRows()-1;
+		int lastRowNo = claimSheet.getLastRowNum();
 
 		//writing input data
 		for(int i=1;i<lastRowNo;i++) {
 			System.out.println(lastRowNo);
-			System.out.println("started processing row :"+i);
-			if(claimSheet.getRow(i).getCell(0).getCellType() != org.apache.poi.ss.usermodel.CellType.BLANK) {
+			System.out.println("started processing row :"+(i+1));
+			if(claimSheet.getRow(i).getCell(0) != null && claimSheet.getRow(i).getCell(0).getCellType() != org.apache.poi.ss.usermodel.CellType.BLANK) {
 				if(claimSheet.getRow(i).getCell(1).getStringCellValue().equals("HCFA")) writeProfData(claimSheet, i, lastRowNo, profDataSheet);
 				else writeInstData(claimSheet, i, lastRowNo, instDataSheet);
 			}
@@ -112,7 +112,6 @@ public class Automation_InputSheet {
 		for(int i=startRowNo;i <= lastRowNo; i++) {
 			HSSFRow claimSheetRow = claimSheet.getRow(i);
 			XSSFRow DataSheetlastRowNo= DataSheet.getRow(DataSheet.getLastRowNum());
-			System.out.println("prof claim key:"+(int)claimSheetRow.getCell(0).getNumericCellValue()+"|"+"start row"+startRowNo);
 			if(i == startRowNo) {
 				DataSheetlastRowNo = DataSheet.createRow(DataSheet.getLastRowNum()+1);
 
@@ -156,9 +155,9 @@ public class Automation_InputSheet {
 				setCellToText(automationInputSheets[1],DataSheetlastRowNo.createCell(16)).setCellValue(getAmountCellData(claimSheetRow.getCell(18)));
 				//unit
 				setCellToText(automationInputSheets[1],DataSheetlastRowNo.createCell(17)).setCellValue(getCellData(claimSheetRow.getCell(17)));
+
 				try {
 					if(claimSheet.getRow(i+1).getCell(1).getStringCellValue().equals("HCFA") || claimSheet.getRow(i+1).getCell(1).getStringCellValue().equals("UB")) break;
-
 					else {
 						System.out.println(claimSheet.getRow(i+1).getCell(1).getStringCellValue());
 						DataSheet.createRow(DataSheet.getLastRowNum()+1);
@@ -177,7 +176,7 @@ public class Automation_InputSheet {
 		for(int i=startRowNo;i <= lastRowNo; i++) {
 			HSSFRow claimSheetRow = claimSheet.getRow(i);
 			XSSFRow DataSheetlastRowNo= DataSheet.getRow(DataSheet.getLastRowNum());
-			System.out.println("inst claim key:"+(int)claimSheetRow.getCell(0).getNumericCellValue()+"|"+"start row"+startRowNo);
+
 			if(i == startRowNo) {
 				DataSheetlastRowNo = DataSheet.createRow(DataSheet.getLastRowNum()+1);
 
@@ -197,15 +196,15 @@ public class Automation_InputSheet {
 				setCellToText(automationInputSheets[0],DataSheetlastRowNo.createCell(21)).setCellValue("7");
 				//DX code
 				String DXCode[] = getCellData(claimSheet.getRow(startRowNo).getCell(7)).split(",");
-					for(int k=0;k<DXCode.length;k++) {
-						setCellToText(automationInputSheets[0],DataSheetlastRowNo.createCell(23+2*k)).setCellValue(DXCode[k]);
-						setCellToText(automationInputSheets[0],DataSheetlastRowNo.createCell(24+2*k)).setCellValue("Y");
-					}
+				for(int k=0;k<DXCode.length;k++) {
+					setCellToText(automationInputSheets[0],DataSheetlastRowNo.createCell(23+2*k)).setCellValue(DXCode[k]);
+					setCellToText(automationInputSheets[0],DataSheetlastRowNo.createCell(24+2*k)).setCellValue("Y");
+				}
 				//bill type
 				setCellToText(automationInputSheets[0],DataSheetlastRowNo.createCell(16)).setCellValue(getCellData(claimSheetRow.getCell(8)));
 				//discharge status
 				setCellToText(automationInputSheets[0],DataSheetlastRowNo.createCell(22)).setCellValue("01");
-				
+
 			}
 			else {
 				//index number
@@ -228,11 +227,10 @@ public class Automation_InputSheet {
 				setCellToText(automationInputSheets[0],DataSheetlastRowNo.createCell(14)).setCellValue(getCellData(claimSheetRow.getCell(17)));
 				//charges
 				setCellToText(automationInputSheets[0],DataSheetlastRowNo.createCell(15)).setCellValue(getAmountCellData(claimSheetRow.getCell(18)));
-				
-				
+
+
 				try {
 					if(claimSheet.getRow(i+1).getCell(1).getStringCellValue().equals("HCFA") || claimSheet.getRow(i+1).getCell(1).getStringCellValue().equals("UB")) break;
-
 					else {
 						System.out.println(claimSheet.getRow(i+1).getCell(1).getStringCellValue());
 						DataSheet.createRow(DataSheet.getLastRowNum()+1);

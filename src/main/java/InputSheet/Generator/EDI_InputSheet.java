@@ -36,8 +36,8 @@ public class EDI_InputSheet {
 		//writing input data
 		for(int i=1;i<lastRowNo;i++) {
 			System.out.println(lastRowNo);
-			System.out.println("started processing row :"+i);
-			if(claimSheet.getRow(i).getCell(0).getCellType() != org.apache.poi.ss.usermodel.CellType.BLANK) {
+			System.out.println("started processing row :"+(i+1));
+			if(claimSheet.getRow(i).getCell(0)!=null && claimSheet.getRow(i).getCell(0).getCellType() != org.apache.poi.ss.usermodel.CellType.BLANK) {
 				if(claimSheet.getRow(i).getCell(1).getStringCellValue().equals("HCFA")) writeProfData(claimSheet, i, lastRowNo, DataSheet);
 				else writeInstData(claimSheet, i, lastRowNo, DataSheet);
 			}
