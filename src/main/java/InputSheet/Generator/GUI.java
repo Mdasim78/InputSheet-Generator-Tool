@@ -40,10 +40,10 @@ public class GUI extends JFrame {
 			//if(selectedFolder != null)
 			try {
 				if(comboBoxLblOutPutType.getSelectedItem().equals("Manual Automation")) {
-					//	XSSFWorkbook[] wbFiles = InputDataFromUTC.generateInputSheet();
-					//	File selectedFolder = showExportDialog("Select destination folder");
-					//	if(selectedFolder != null) exportSheetFile(selectedFolder,wbFiles);
-					//	System.out.println("File exported sucessully to "+selectedFolder.getAbsolutePath());
+						XSSFWorkbook[] wbFiles = Automation_InputSheet.generateAutomationInputSheet();
+						File selectedFolder = showExportDialog("Select destination folder");
+						if(selectedFolder != null) exportSheetFile(selectedFolder,wbFiles);
+						System.out.println("File exported sucessully to "+selectedFolder.getAbsolutePath());
 				}
 				else {
 					XSSFWorkbook EDIwb = EDI_InputSheet.generateEdiInputSheet();
@@ -67,8 +67,8 @@ public class GUI extends JFrame {
 	private static void exportSheetFile(File destinationFolder, XSSFWorkbook[] wbFiles) throws IOException {
 		for(XSSFWorkbook wb:wbFiles) {
 			File outputFile;
-			if(wb == wbFiles[0]) outputFile = new File(destinationFolder, "Claim Data Institutional.xlsx");
-			else outputFile = new File(destinationFolder, "Claim Data Professional.xlsx");
+			if(wb == wbFiles[0]) outputFile = new File(destinationFolder, "Claim_Data_Institutional.xlsx");
+			else outputFile = new File(destinationFolder, "Claim_Data_Professional.xlsx");
 			try(FileOutputStream fos = new FileOutputStream(outputFile) ){
 				wb.write(fos);
 				fos.close();
