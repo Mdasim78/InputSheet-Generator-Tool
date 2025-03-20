@@ -19,11 +19,9 @@ node {
     def mvn = tool 'Maven';
     
     withSonarQubeEnv('SonarQube-Server') {
-    //  withCredentials([string(credentialsId: 'inputSheetGenerator_sonarqube_token', variable: 'SONAR_TOKEN')]) {
         bat """
         "${mvn}\\bin\\mvn" clean verify sonar:sonar ^
-        -Dsonar.host.url=http://10.215.123.115:9000/ ^
-        -Dsonar.login=${inputSheetGenerator_sonarqube_token}
+        -Dsonar.login=%inputSheetGenerator_sonarqube_token%
         """
       }
     }
