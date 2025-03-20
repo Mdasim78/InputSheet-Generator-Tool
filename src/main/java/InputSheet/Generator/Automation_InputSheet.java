@@ -235,6 +235,7 @@ public class Automation_InputSheet {
 						System.out.println(claimSheet.getRow(i+1).getCell(1).getStringCellValue());
 						DataSheet.createRow(DataSheet.getLastRowNum()+1);
 					}
+					
 				}
 				catch(NullPointerException e) {
 					break;

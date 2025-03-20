@@ -95,8 +95,8 @@ public class EDI_InputSheet {
 	public static String getAmountCellData(HSSFCell cell) {
 		try {
 			switch(cell.getCellType()) {
-			case NUMERIC:return String.valueOf(((double)cell.getNumericCellValue())).replaceAll(" ","");
-			case STRING: return cell.getStringCellValue().replaceAll("[^\\d]","");
+			case NUMERIC:return String.valueOf(((double)cell.getNumericCellValue())).replace(" ","");
+			case STRING: return cell.getStringCellValue().replace("[^\\d]","");
 			}
 		}
 		catch (NullPointerException e) {
