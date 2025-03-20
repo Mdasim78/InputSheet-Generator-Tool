@@ -21,6 +21,8 @@ node {
     withSonarQubeEnv('SonarQube-Server') {
         bat """
         "${mvn}\\bin\\mvn" clean verify sonar:sonar ^
+        -Dsonar.projectKey=Mdasim78_InputSheet-Generator-Tool_b9a19f5f-78c5-4de8-98c5-078a04cf854a ^
+        -Dsonar.projectName='InputSheet-Generator-Tool' ^
         -Dsonar.login=%inputSheetGenerator_sonarqube_token%
         """
       }
